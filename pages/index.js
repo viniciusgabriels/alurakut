@@ -14,11 +14,17 @@ function ProfileSidebar(props) {
 export default function Home() {
   const githubUser = 'viniciusgabriels';
   const pessoasFavoritas = [
-    'juunegreiros',
-    'peas', 
     'omariosouto', 
     'rafaballerini', 
     'marcobrunodev',
+    'kevin-powell',
+    'diego3g',
+    'filipedeschamps',
+    // 'juunegreiros',
+    // 'peas', 
+    // 'vanessametonini',
+    // 'JulianaAmoasei',
+    // 'gabsferreira',
   ]
 
   return (
