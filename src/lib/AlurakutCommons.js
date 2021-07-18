@@ -49,6 +49,7 @@ export function AlurakutMenu({ githubUser }) {
         </button>
       </div>
       <AlurakutMenuProfileSidebar githubUser={githubUser} />
+      {console.log("githubUser: " + githubUser)}
     </AlurakutMenu.Wrapper>
   )
 }
