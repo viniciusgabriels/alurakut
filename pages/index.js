@@ -45,37 +45,38 @@ function ProfileRelationsBox(props) {
 }
 
 export default function Home() {
-  const [comunidades, setComunidades] = useState([{
-    id: '654684324',
-    title: 'Eu odeio acordar cedo',
-    image: 'https://alurakut.vercel.app/capa-comunidade-01.jpg'
-  },
-  {
-    id: '6546871',
-    title: 'Eu abro a geladeira pra pensar',
-    image: 'https://pbs.twimg.com/media/CQWp7t4WgAAGam7.jpg:large'
-  },
-  {
-    id: '6546873',
-    title: 'Imagina se pega no olho?',
-    image: 'https://img10.orkut.br.com/community/5373477955e66c51a726293.60511497_348c38258d729e2060a94187fd78b146.jpg'
-  },
-  {
-    id: '6546874',
-    title: 'Lindomar, O SubZero Brasileiro',
-    image: 'https://pbs.twimg.com/media/DotI5JpU8AAwB1f.jpg'
-  },
-  {
-    id: '6546875',
-    title: 'Se eu Morrer Minha Mãe me Mata',
-    image: 'https://www.giantbomb.com/a/uploads/scale_small/0/6172/1548061-1.jpg'
-  },
-  {
-    id: '6546876',
-    title: 'Tenho medo da Véia(o) Quaker!',
-    image: 'https://img10.orkut.br.com/community/3b860ff2a931fc79ba0de8aab1ef17de.jpg'
-  },
-  ]);
+  const [comunidades, setComunidades] = useState([]);
+  // {
+  //   id: '654684324',
+  //   title: 'Eu odeio acordar cedo',
+  //   image: 'https://alurakut.vercel.app/capa-comunidade-01.jpg'
+  // },
+  // {
+  //   id: '6546871',
+  //   title: 'Eu abro a geladeira pra pensar',
+  //   image: 'https://pbs.twimg.com/media/CQWp7t4WgAAGam7.jpg:large'
+  // },
+  // {
+  //   id: '6546873',
+  //   title: 'Imagina se pega no olho?',
+  //   image: 'https://img10.orkut.br.com/community/5373477955e66c51a726293.60511497_348c38258d729e2060a94187fd78b146.jpg'
+  // },
+  // {
+  //   id: '6546874',
+  //   title: 'Lindomar, O SubZero Brasileiro',
+  //   image: 'https://pbs.twimg.com/media/DotI5JpU8AAwB1f.jpg'
+  // },
+  // {
+  //   id: '6546875',
+  //   title: 'Se eu Morrer Minha Mãe me Mata',
+  //   image: 'https://www.giantbomb.com/a/uploads/scale_small/0/6172/1548061-1.jpg'
+  // },
+  // {
+  //   id: '6546876',
+  //   title: 'Tenho medo da Véia(o) Quaker!',
+  //   image: 'https://img10.orkut.br.com/community/3b860ff2a931fc79ba0de8aab1ef17de.jpg'
+  // },
+  
   const githubUser = 'viniciusgabriels';
   const pessoasFavoritas = [
     'omariosouto', 
@@ -100,6 +101,28 @@ export default function Home() {
     })
     .then(function(respostaCompleta) {
       setSeguidores(respostaCompleta);
+    })
+
+    fetch('https://graphql.datocms.com/', {
+      method: 'POST',
+      headers: {
+        'Authorization': '78c8e2923a998ddc7aa1099633f6af',
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({ "query": `query {
+        allCommunities {
+          id
+          title
+          imageUrl
+          creatorSlug
+        }
+      }` })
+    })
+    .then((response) => response.json())
+    .then((respostaCompleta) => {
+      const comunidadesDato = respostaCompleta.data.allCommunities;
+      setComunidades(comunidadesDato)
     })
   }, [])
 
@@ -127,13 +150,26 @@ export default function Home() {
               const dadosDosForm = new FormData(e.target);
 
               const comunidade = {
-                id: new Date().toISOString(),
                 title: dadosDoForm.get('title'),
-                image: dadosDoForm.get('image'),
+                imageUrl: dadosDoForm.get('image'),
+                creatorSlug: githubUser,
               }
 
-              const comunidadesAtualizadas = [...comunidades, comunidade];
-              setComunidades(comunidadesAtualizadas);
+              fetch('/api/comunidades', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(comunidade),
+              })
+              .then(async (response) => {
+                const dados = await response.json();
+                console.log(dados.registroCriado);
+                const comunidade = dados.registroCriado;
+                const comunidadesAtualizadas = [...comunidades, comunidade];
+                setComunidades(comunidadesAtualizadas);
+              })
+              
             }}>
               <div>                
                 <input 
@@ -169,7 +205,7 @@ export default function Home() {
             {pessoasFavoritas.map((itemAtual) => {
               return (
                 <li key={itemAtual}>                  
-                  <a href={`/users/${itemAtual}`} hey={itemAtual}>                
+                  <a href={`/users/${itemAtual}`}>                
                     <img src={`https://github.com/${itemAtual}.png`} />
                     <span>{itemAtual}</span>
                   </a>
@@ -186,7 +222,7 @@ export default function Home() {
             {seguidores.map((itemAtual) => {
               return (
                 <li key={itemAtual}>                  
-                  <a href={`/users/${itemAtual}`} hey={itemAtual}>                
+                  <a href={`/users/${itemAtual}`}>                
                     <img src={`https://github.com/${itemAtual.login}.png`} />
                     <span>{itemAtual}</span>
                   </a>
@@ -203,8 +239,8 @@ export default function Home() {
             {comunidades.map((itemAtual) => {
               return (
                 <li key={itemAtual.id}>                  
-                  <a href={`/users/${itemAtual.title}`} hey={itemAtual.title}>                
-                    <img src={itemAtual.image} />
+                  <a href={`/communities/${itemAtual.id}`}>
+                    <img src={itemAtual.imageUrl} />
                     <span>{itemAtual.title}</span>
                   </a>
                 </li>
