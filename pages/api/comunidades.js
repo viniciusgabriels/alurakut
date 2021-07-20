@@ -15,7 +15,7 @@ export default async function recebedorDeRequests(request, response) {
             // creatorSlug: "viniciusgabriels",
         });
 
-        console.log(registroCriado); //deve aparecer somente no terminal, não no console d onavegador
+        console.log(registroCriado); //deve aparecer somente no terminal, não no console do navegador
 
         response.json({
             dados: 'Algum dado qualquer',
